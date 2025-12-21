@@ -1,0 +1,48 @@
+# ========= Android Studio / IntelliJ =========
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# ========= Gradle =========
+.gradle/
+build/
+**/build/
+
+# ========= Local SDK config =========
+local.properties
+
+# ========= OS files =========
+.DS_Store
+Thumbs.db
+
+# ========= Logs =========
+*.log
+
+# ========= APK / AAB =========
+*.apk
+*.aab
+
+# ========= Java/Kotlin =========
+*.class
+
+# ========= Native build =========
+.externalNativeBuild/
+.cxx/
+
+# ========= Lint / reports =========
+lint/
+lint-results*.xml
+lint-results*.html
+problems-report.html
+
+# ========= Firebase / Google =========
+google-services.json
+
+# ========= Keystore =========
+*.jks
+*.keystore
+
+# ========= Debug files =========
+captures/
