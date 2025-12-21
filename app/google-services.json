@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "239597886304",
+    "project_id": "attendit-8492b",
+    "storage_bucket": "attendit-8492b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:239597886304:android:01daeedc460072a3765c05",
+        "android_client_info": {
+          "package_name": "com.aman.attendit"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUu4zjDw7oMuuFkFL6WtrqkgDJ4E3rbWw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
