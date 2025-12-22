@@ -47,4 +47,7 @@ class AttendanceRepository @Inject constructor(
     fun getAttendanceBySubject(subjectId: Int) =
         attendanceDao.getAttendanceBySubject(subjectId)
 
+    suspend fun deleteAllAttendance() {
+        attendanceDao.deleteAllAttendance()
+    }
 }

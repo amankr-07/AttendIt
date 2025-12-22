@@ -7,7 +7,6 @@ import com.aman.attendit.data.local.entity.AttendanceStatus
 import com.aman.attendit.data.repository.AttendanceRepository
 import com.aman.attendit.data.repository.SubjectRepository
 import com.aman.attendit.data.repository.TimetableRepository
-import com.aman.attendit.ui.timetable.TimetableUiModel
 import com.aman.attendit.utils.todayStartMillis
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -23,10 +22,7 @@ class AttendanceViewModel @Inject constructor(
     private val timetableRepository: TimetableRepository
 ) : ViewModel() {
 
-    fun markAttendance(
-        subjectId: Int,
-        status: AttendanceStatus
-    ) {
+    fun markAttendance(subjectId: Int, status: AttendanceStatus) {
         viewModelScope.launch {
             attendanceRepository.markAttendanceOnce(
                 subjectId = subjectId,
@@ -36,32 +32,29 @@ class AttendanceViewModel @Inject constructor(
         }
     }
 
-    fun updateAttendance(record: AttendanceEntity) {
-        viewModelScope.launch {
-            attendanceRepository.updateAttendance(record)
-        }
-    }
-
-    fun deleteAttendance(attendanceId: Int) {
-        viewModelScope.launch {
-            attendanceRepository.deleteAttendance(attendanceId)
-        }
-    }
-
-    fun todayClasses(): Flow<List<TimetableUiModel>> {
+    fun todayClasses(): Flow<List<AttendanceUiModel>> {
         val today = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
-        return timetableRepository
-            .getTimetableForDay(today)
-            .combine(subjectRepository.getAllSubjects()) { timetable, subjects ->
-                timetable.map { entry ->
-                    val subjectName = subjects
-                        .find { it.subjectId == entry.subjectId }
-                        ?.subjectName ?: "Unknown"
+        val todayMillis = todayStartMillis()
 
-                    TimetableUiModel(entry, subjectName)
-                }
+        return combine(
+            timetableRepository.getTimetableForDay(today),
+            subjectRepository.getAllSubjects(),
+            attendanceRepository.getAllAttendance()
+        ) { timetable, subjects, allAttendance ->
+            timetable.map { entry ->
+                val subjectName = subjects.find { it.subjectId == entry.subjectId }?.subjectName ?: "Unknown"
+                val existingRecord = allAttendance.find { it.subjectId == entry.subjectId && it.date == todayMillis }
+
+                AttendanceUiModel(
+                    entity = existingRecord ?: AttendanceEntity(
+                        subjectId = entry.subjectId,
+                        date = todayMillis,
+                        status = AttendanceStatus.PRESENT
+                    ),
+                    subjectName = subjectName,
+                    isMarked = existingRecord != null
+                )
             }
+        }
     }
-
 }
-

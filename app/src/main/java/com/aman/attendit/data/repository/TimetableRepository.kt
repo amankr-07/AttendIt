@@ -24,4 +24,8 @@ class TimetableRepository @Inject constructor(
     suspend fun deleteEntry(id: Int) {
         timetableDao.deleteEntry(id)
     }
+
+    suspend fun deleteAllTimetable() {
+        timetableDao.deleteAllTimetable()
+    }
 }

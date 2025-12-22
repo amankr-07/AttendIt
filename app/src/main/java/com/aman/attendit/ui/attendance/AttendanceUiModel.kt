@@ -4,5 +4,6 @@ import com.aman.attendit.data.local.entity.AttendanceEntity
 
 data class AttendanceUiModel(
     val entity: AttendanceEntity,
-    val subjectName: String
+    val subjectName: String,
+    val isMarked: Boolean
 )

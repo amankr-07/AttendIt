@@ -24,6 +24,22 @@ class SubjectViewModel @Inject constructor(
                 initialValue = emptyList()
             )
 
+    fun addSubject(
+        name: String,
+        targetAttendancePercentage: Int?
+    ) {
+        if (name.isBlank()) return
+
+        viewModelScope.launch {
+            subjectRepository.insertSubject(
+                SubjectEntity(
+                    subjectName = name.trim(),
+                    targetAttendancePercentage = targetAttendancePercentage
+                )
+            )
+        }
+    }
+
     fun updateSubject(
         subjectId: Int,
         newName: String,
@@ -39,5 +55,4 @@ class SubjectViewModel @Inject constructor(
             )
         }
     }
-
 }

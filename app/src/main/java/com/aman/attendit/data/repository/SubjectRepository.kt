@@ -12,15 +12,19 @@ class SubjectRepository @Inject constructor(
 
     fun getAllSubjects() = subjectDao.getAllSubjects()
 
-    suspend fun saveSubject(subject: SubjectEntity) {
+    suspend fun insertSubject(subject: SubjectEntity) {
         subjectDao.insertSubject(subject)
     }
 
     suspend fun updateSubject(subject: SubjectEntity) {
-        subjectDao.insertSubject(subject)
+        subjectDao.updateSubject(subject)
     }
 
     suspend fun deleteSubject(subjectId: Int) {
         subjectDao.deleteSubjectById(subjectId)
+    }
+
+    suspend fun deleteAllSubjects() {
+        subjectDao.deleteAllSubjects()
     }
 }

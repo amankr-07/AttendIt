@@ -1,23 +1,19 @@
 package com.aman.attendit.ui.timetable
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Book
+import androidx.compose.material.icons.outlined.Schedule
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.aman.attendit.data.local.entity.TimetableEntity
 import com.aman.attendit.utils.TimeValidator
-import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun EditTimetableDialog(
@@ -27,57 +23,70 @@ fun EditTimetableDialog(
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
-
     var start by remember { mutableStateOf(entry.startTime) }
     var end by remember { mutableStateOf(entry.endTime) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Edit Timetable") },
+        title = {
+            Text("Edit Class Timing", fontWeight = FontWeight.Bold)
+        },
         text = {
-            Column {
-                Text("Subject: $subjectName")
-
-                Spacer(Modifier.height(8.dp))
-
-                TextField(
-                    value = start,
-                    onValueChange = { start = it },
-                    label = { Text("Start Time (hh:mm AM/PM)") }
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(
+                    value = subjectName,
+                    onValueChange = {},
+                    label = { Text("Subject") },
+                    readOnly = true,
+                    leadingIcon = { Icon(Icons.Outlined.Book, null) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = TextFieldDefaults.colors(
+                        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                    )
                 )
 
-                TextField(
+                OutlinedTextField(
+                    value = start,
+                    onValueChange = { start = it },
+                    label = { Text("Start Time") },
+                    placeholder = { Text("hh:mm AM/PM") },
+                    leadingIcon = { Icon(Icons.Outlined.Schedule, null) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    singleLine = true
+                )
+
+                OutlinedTextField(
                     value = end,
                     onValueChange = { end = it },
-                    label = { Text("End Time (hh:mm AM/PM)") }
+                    label = { Text("End Time") },
+                    placeholder = { Text("hh:mm AM/PM") },
+                    leadingIcon = { Icon(Icons.Outlined.Schedule, null) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    singleLine = true
                 )
             }
         },
         confirmButton = {
-            TextButton(onClick = {
+            Button(
+                onClick = {
+                    if (start.isBlank() || end.isBlank()) {
+                        Toast.makeText(context, "Times cannot be empty", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
 
-                if (start.isBlank() || end.isBlank()) {
-                    Toast.makeText(
-                        context,
-                        "Start and/or End time cannot be empty",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    return@TextButton
-                }
+                    if (!TimeValidator.isValid(start) || !TimeValidator.isValid(end)) {
+                        Toast.makeText(context, "Invalid format. Use hh:mm AM/PM", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
 
-                if (!TimeValidator.isValid(start) || !TimeValidator.isValid(end)) {
-                    Toast.makeText(
-                        context,
-                        "Invalid time format. Use hh:mm AM/PM",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    return@TextButton
-                }
-
-                onSave(start.trim(), end.trim())
-
-            }) {
-                Text("Save")
+                    onSave(start.trim(), end.trim())
+                },
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text("Save Changes")
             }
         },
         dismissButton = {

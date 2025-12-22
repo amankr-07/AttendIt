@@ -55,6 +55,9 @@ private fun AuthHost(viewModel: AuthViewModel) {
                     Intent(context, MainActivity::class.java)
                 )
                 (context as Activity).finish()
+            },
+            onBackToLogin = {
+                isLogin = true
             }
         )
     }

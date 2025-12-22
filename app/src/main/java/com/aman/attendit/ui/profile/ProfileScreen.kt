@@ -19,6 +19,7 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -34,7 +35,10 @@ fun ProfileScreen(
         }
     ) { padding ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding).padding(24.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Surface(
@@ -47,25 +51,64 @@ fun ProfileScreen(
                 }
             }
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(modifier = Modifier.weight(1f))
 
             Button(
-                onClick = {
-                    viewModel.logout()
-                    context.startActivity(Intent(context, AuthActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    })
-                    (context as Activity).finish()
-                },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
+                onClick = { showLogoutDialog = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.errorContainer,
                     contentColor = MaterialTheme.colorScheme.onErrorContainer
                 ),
                 shape = MaterialTheme.shapes.large
             ) {
-                Text("Log Out", fontWeight = FontWeight.Bold)
+                Text("Log Out & Clear All Data", fontWeight = FontWeight.Bold)
             }
+
+            Spacer(Modifier.height(24.dp))
+
+            Text(
+                text = "Made with ❤️ by AK",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                fontWeight = FontWeight.Medium
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
         }
+    }
+
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            title = { Text("Log Out & Clear All Data?") },
+            text = {
+                Text("This will permanently delete all your attendance history, subjects, and timetable from this device. You will need to log in again.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showLogoutDialog = false
+                        viewModel.clearDataAndLogout {
+                            val intent = Intent(context, AuthActivity::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            }
+                            context.startActivity(intent)
+                            (context as Activity).finish()
+                        }
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Delete & Log Out")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLogoutDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
