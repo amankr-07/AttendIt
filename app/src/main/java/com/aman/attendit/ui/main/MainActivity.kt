@@ -4,15 +4,16 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -28,6 +29,9 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        enableEdgeToEdge()
 
         if (FirebaseAuth.getInstance().currentUser == null) {
             startActivity(Intent(this, AuthActivity::class.java))
@@ -50,6 +54,7 @@ class MainActivity : ComponentActivity() {
                 )
 
                 Scaffold(
+                    modifier = Modifier.fillMaxSize(),
                     bottomBar = {
                         val showBottomBar = currentDestination?.route !in listOf("login", "register")
 
@@ -58,45 +63,67 @@ class MainActivity : ComponentActivity() {
                             enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
                             exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
                         ) {
-                            NavigationBar(
+                            Box(
                                 modifier = Modifier
-                                    .padding(horizontal = 24.dp, vertical = 20.dp)
-                                    .clip(CircleShape)
-                                    .height(64.dp),
-                                containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
-                                tonalElevation = 0.dp
+                                    .fillMaxWidth()
+                                    .navigationBarsPadding()
+                                    .padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
+                                contentAlignment = Alignment.BottomCenter
                             ) {
-                                items.forEach { item ->
-                                    val isSelected = currentDestination?.hierarchy?.any {
-                                        it.route == item.route
-                                    } == true
+                                Surface(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(72.dp),
+                                    shape = RoundedCornerShape(24.dp),
+                                    color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+                                    tonalElevation = 8.dp,
+                                    shadowElevation = 10.dp
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxSize(),
+                                        horizontalArrangement = Arrangement.SpaceAround,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        items.forEach { item ->
+                                            val isSelected = currentDestination?.hierarchy?.any {
+                                                it.route == item.route
+                                            } == true
 
-                                    NavigationBarItem(
-                                        selected = isSelected,
-                                        alwaysShowLabel = false,
-                                        onClick = {
-                                            navController.navigate(item.route) {
-                                                popUpTo(navController.graph.findStartDestination().id) {
-                                                    saveState = true
+                                            IconButton(
+                                                onClick = {
+                                                    navController.navigate(item.route) {
+                                                        popUpTo(navController.graph.findStartDestination().id) {
+                                                            saveState = true
+                                                        }
+                                                        launchSingleTop = true
+                                                        restoreState = true
+                                                    }
+                                                },
+                                                modifier = Modifier.weight(1f)
+                                            ) {
+                                                Column(
+                                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                                    verticalArrangement = Arrangement.Center
+                                                ) {
+                                                    Icon(
+                                                        imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
+                                                        contentDescription = item.title,
+                                                        modifier = Modifier.size(24.dp),
+                                                        tint = if (isSelected)
+                                                            MaterialTheme.colorScheme.primary
+                                                        else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                                    )
+                                                    if (isSelected) {
+                                                        Text(
+                                                            text = item.title,
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                            color = MaterialTheme.colorScheme.primary
+                                                        )
+                                                    }
                                                 }
-                                                launchSingleTop = true
-                                                restoreState = true
                                             }
-                                        },
-                                        icon = {
-                                            Icon(
-                                                imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
-                                                contentDescription = item.title,
-                                                modifier = Modifier.size(26.dp),
-                                                tint = if (isSelected)
-                                                    MaterialTheme.colorScheme.primary
-                                                else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                                            )
-                                        },
-                                        colors = NavigationBarItemDefaults.colors(
-                                            indicatorColor = Color.Transparent
-                                        )
-                                    )
+                                        }
+                                    }
                                 }
                             }
                         }
