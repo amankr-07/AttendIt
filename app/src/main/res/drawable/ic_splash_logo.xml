@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+    <item
+        android:drawable="@mipmap/app_logo"
+        android:gravity="center"
+        android:top="24.dp"
+        android:bottom="24.dp"
+        android:left="24.dp"
+        android:right="24.dp" />
+</layer-list>
