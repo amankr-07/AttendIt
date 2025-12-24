@@ -66,7 +66,7 @@ app/
 
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/amankr-07/BunkMate.git](https://github.com/amankr-07/AttendIt.git)
+   git clone https://github.com/amankr-07/AttendIt.git
    ```
 
 2. Open the project in **Android Studio**
