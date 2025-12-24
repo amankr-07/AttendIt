@@ -7,36 +7,23 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface AttendanceDao {
 
-    @Query("SELECT * FROM attendance ORDER BY date DESC")
+    @Query("SELECT * FROM attendance")
     fun getAllAttendance(): Flow<List<AttendanceEntity>>
 
     @Query("""
-        SELECT * FROM attendance
-        WHERE subjectId = :subjectId AND date = :date
-        LIMIT 1
+        SELECT * FROM attendance 
+        WHERE timetableId = :timetableId AND date = :date
     """)
-    suspend fun getAttendanceForSubjectOnDate(
-        subjectId: Int,
+    suspend fun getAttendanceForSession(
+        timetableId: Int,
         date: Long
     ): AttendanceEntity?
 
-    @Query("""
-        SELECT * FROM attendance
-        WHERE subjectId = :subjectId
-        ORDER BY date DESC
-    """)
-    fun getAttendanceBySubject(
-        subjectId: Int
-    ): Flow<List<AttendanceEntity>>
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAttendance(attendance: AttendanceEntity)
 
-    @Insert
-    suspend fun insertAttendance(entity: AttendanceEntity)
-
-    @Update
-    suspend fun updateAttendance(entity: AttendanceEntity)
-
-    @Query("DELETE FROM attendance WHERE attendanceId = :id")
-    suspend fun deleteAttendance(id: Int)
+    @Query("SELECT * FROM attendance WHERE subjectId = :subjectId")
+    fun getAttendanceBySubject(subjectId: Int): Flow<List<AttendanceEntity>>
 
     @Query("DELETE FROM attendance")
     suspend fun deleteAllAttendance()

@@ -2,6 +2,7 @@ package com.aman.attendit.ui.dashboard
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,8 +16,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 fun DashboardScreen(
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
-    val subjects by viewModel.subjects.collectAsState(initial = emptyList())
-    val overallData by viewModel.overallAttendance.collectAsState()
+    val analytics by viewModel.subjectAnalytics.collectAsState()
+    val overall by viewModel.overallAttendance.collectAsState()
 
     Scaffold(
         topBar = {
@@ -31,74 +32,33 @@ fun DashboardScreen(
             )
         }
     ) { padding ->
-        if (subjects.isEmpty()) {
+        if (analytics.isEmpty()) {
             Box(
-                modifier = Modifier.fillMaxSize().padding(padding),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
                 EmptyDashboard()
             }
         } else {
             LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(padding),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
                 contentPadding = PaddingValues(bottom = 16.dp)
             ) {
                 item {
                     OverallAttendanceCard(
-                        presentCount = overallData.first,
-                        percentage = overallData.second
+                        presentCount = overall.first,
+                        percentage = overall.second
                     )
                 }
 
-                item {
-                    SubjectAnalyticsList(
-                        subjects = subjects,
-                        viewModel = viewModel
-                    )
+                items(analytics) { item ->
+                    SubjectAnalyticsCard(item)
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun OverallAttendanceCard(presentCount: Int, percentage: Float) {
-    ElevatedCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        shape = MaterialTheme.shapes.extraLarge,
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
-    ) {
-        Column(modifier = Modifier.padding(24.dp)) {
-            Text(
-                text = "Overall Attendance",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-
-            Text(
-                text = "${percentage.toInt()}%",
-                style = MaterialTheme.typography.displayLarge,
-                fontWeight = FontWeight.Black,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-
-            LinearProgressIndicator(
-                progress = percentage / 100f,
-                modifier = Modifier.fillMaxWidth().height(10.dp).padding(vertical = 8.dp),
-                color = MaterialTheme.colorScheme.primary,
-                trackColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.15f),
-                strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
-            )
-
-            Text(
-                text = "Total $presentCount classes attended",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-            )
         }
     }
 }

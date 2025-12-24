@@ -3,51 +3,42 @@ package com.aman.attendit.data.repository
 import com.aman.attendit.data.local.dao.AttendanceDao
 import com.aman.attendit.data.local.entity.AttendanceEntity
 import com.aman.attendit.data.local.entity.AttendanceStatus
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AttendanceRepository @Inject constructor(
-    private val attendanceDao: AttendanceDao
+    private val dao: AttendanceDao
 ) {
 
-    fun getAllAttendance() = attendanceDao.getAllAttendance()
+    fun getAllAttendance(): Flow<List<AttendanceEntity>> =
+        dao.getAllAttendance()
 
-    suspend fun markAttendanceOnce(
+    fun getAttendanceBySubject(subjectId: Int): Flow<List<AttendanceEntity>> =
+        dao.getAttendanceBySubject(subjectId)
+
+    suspend fun markAttendance(
+        timetableId: Int,
         subjectId: Int,
         date: Long,
         status: AttendanceStatus
     ) {
-        val existing =
-            attendanceDao.getAttendanceForSubjectOnDate(subjectId, date)
+        val existing = dao.getAttendanceForSession(timetableId, date)
 
-        if (existing == null) {
-            attendanceDao.insertAttendance(
-                AttendanceEntity(
-                    subjectId = subjectId,
-                    date = date,
-                    status = status
-                )
+        dao.insertAttendance(
+            AttendanceEntity(
+                attendanceId = existing?.attendanceId ?: 0,
+                timetableId = timetableId,
+                subjectId = subjectId,
+                date = date,
+                status = status
             )
-        } else {
-            attendanceDao.updateAttendance(
-                existing.copy(status = status)
-            )
-        }
+        )
     }
-
-    suspend fun updateAttendance(entity: AttendanceEntity) {
-        attendanceDao.updateAttendance(entity)
-    }
-
-    suspend fun deleteAttendance(id: Int) {
-        attendanceDao.deleteAttendance(id)
-    }
-
-    fun getAttendanceBySubject(subjectId: Int) =
-        attendanceDao.getAttendanceBySubject(subjectId)
 
     suspend fun deleteAllAttendance() {
-        attendanceDao.deleteAllAttendance()
+        dao.deleteAllAttendance()
     }
+
 }

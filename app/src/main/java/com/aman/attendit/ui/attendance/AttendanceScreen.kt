@@ -11,8 +11,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.aman.attendit.data.local.entity.AttendanceStatus
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,31 +32,25 @@ fun AttendanceScreen(
             )
         }
     ) { padding ->
-        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
             if (todayClasses.isEmpty()) {
-                Column(
+                Text(
+                    text = "No classes today 🎉",
                     modifier = Modifier.align(Alignment.Center),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "No classes today 🎉",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Enjoy your free time or check your timetable",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                    )
-                }
+                    style = MaterialTheme.typography.bodyLarge
+                )
             } else {
                 LazyColumn(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(todayClasses) { item ->
-                        val currentStatus = item.entity.status
+
+                        val currentStatus = item.status
 
                         Card(
                             modifier = Modifier.fillMaxWidth(),
@@ -77,44 +69,55 @@ fun AttendanceScreen(
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.SemiBold
                                     )
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                    Text(
-                                        text = "Today's Schedule",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
-                                    )
                                 }
 
                                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                    val currentStatus = if (item.isMarked) item.entity.status else null
 
                                     FilledTonalIconButton(
-                                        onClick = { viewModel.markAttendance(item.entity.subjectId, AttendanceStatus.PRESENT) },
+                                        onClick = {
+                                            viewModel.markAttendance(
+                                                timetableId = item.timetableId,
+                                                subjectId = item.subjectId,
+                                                status = AttendanceStatus.PRESENT
+                                            )
+                                        },
                                         colors = IconButtonDefaults.filledTonalIconButtonColors(
-                                            containerColor = if (currentStatus == AttendanceStatus.PRESENT)
-                                                MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                                            contentColor = if (currentStatus == AttendanceStatus.PRESENT)
-                                                MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                                            containerColor =
+                                                if (currentStatus == AttendanceStatus.PRESENT)
+                                                    MaterialTheme.colorScheme.primary
+                                                else MaterialTheme.colorScheme.surfaceVariant
                                         )
                                     ) { Text("✔") }
 
                                     FilledTonalIconButton(
-                                        onClick = { viewModel.markAttendance(item.entity.subjectId, AttendanceStatus.ABSENT) },
+                                        onClick = {
+                                            viewModel.markAttendance(
+                                                timetableId = item.timetableId,
+                                                subjectId = item.subjectId,
+                                                status = AttendanceStatus.ABSENT
+                                            )
+                                        },
                                         colors = IconButtonDefaults.filledTonalIconButtonColors(
-                                            containerColor = if (currentStatus == AttendanceStatus.ABSENT)
-                                                MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.surfaceVariant,
-                                            contentColor = if (currentStatus == AttendanceStatus.ABSENT)
-                                                MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onSurfaceVariant
+                                            containerColor =
+                                                if (currentStatus == AttendanceStatus.ABSENT)
+                                                    MaterialTheme.colorScheme.error
+                                                else MaterialTheme.colorScheme.surfaceVariant
                                         )
                                     ) { Text("✘") }
 
                                     FilledTonalIconButton(
-                                        onClick = { viewModel.markAttendance(item.entity.subjectId, AttendanceStatus.CANCELLED) },
+                                        onClick = {
+                                            viewModel.markAttendance(
+                                                timetableId = item.timetableId,
+                                                subjectId = item.subjectId,
+                                                status = AttendanceStatus.CANCELLED
+                                            )
+                                        },
                                         colors = IconButtonDefaults.filledTonalIconButtonColors(
-                                            containerColor = if (currentStatus == AttendanceStatus.CANCELLED)
-                                                MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.surfaceVariant,
-                                            contentColor = if (currentStatus == AttendanceStatus.CANCELLED)
-                                                MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onSurfaceVariant
+                                            containerColor =
+                                                if (currentStatus == AttendanceStatus.CANCELLED)
+                                                    MaterialTheme.colorScheme.tertiary
+                                                else MaterialTheme.colorScheme.surfaceVariant
                                         )
                                     ) { Text("🚫") }
                                 }
