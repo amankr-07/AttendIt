@@ -38,4 +38,20 @@ class ProfileViewModel @Inject constructor(
             onComplete()
         }
     }
+
+    fun clearData(onComplete: () -> Unit) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val d1 = async { attendanceRepository.deleteAllAttendance() }
+                val d2 = async { subjectRepository.deleteAllSubjects() }
+                val d3 = async { timetableRepository.deleteAllTimetable() }
+
+                d1.await()
+                d2.await()
+                d3.await()
+            }
+
+            onComplete()
+        }
+    }
 }

@@ -2,6 +2,7 @@ package com.aman.attendit.ui.profile
 
 import android.app.Activity
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,6 +21,7 @@ fun ProfileScreen(
 ) {
     val context = LocalContext.current
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var showClearDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -51,6 +53,22 @@ fun ProfileScreen(
                 }
             }
 
+            Spacer(modifier = Modifier.weight(10f))
+
+            Button(
+                onClick = { showClearDialog = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer
+                ),
+                shape = MaterialTheme.shapes.large
+            ) {
+                Text("Clear Data", fontWeight = FontWeight.Bold)
+            }
+
             Spacer(modifier = Modifier.weight(1f))
 
             Button(
@@ -64,7 +82,7 @@ fun ProfileScreen(
                 ),
                 shape = MaterialTheme.shapes.large
             ) {
-                Text("Log Out & Clear All Data", fontWeight = FontWeight.Bold)
+                Text("Log Out", fontWeight = FontWeight.Bold)
             }
 
             Spacer(Modifier.height(24.dp))
@@ -106,6 +124,34 @@ fun ProfileScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showLogoutDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    if (showClearDialog) {
+        AlertDialog(
+            onDismissRequest = { showClearDialog = false },
+            title = { Text("Clear All Data?") },
+            text = {
+                Text("This will permanently delete all your attendance history, subjects, and timetable from this device.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showClearDialog = false
+                        viewModel.clearData {
+                            Toast.makeText(context, "All data cleared", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Clear Data")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearDialog = false }) {
                     Text("Cancel")
                 }
             }
